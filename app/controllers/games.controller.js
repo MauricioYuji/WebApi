@@ -5,12 +5,12 @@ exports.findAll = (req, res) => {
     var perpage = 10;
     var s = req.query.s;
     var g = req.query.g;
-    var c = req.query.c.split(",").map(Number);
+    var c = req.query.c;
 
     var search = {};
     console.log("s: ", s);
-    var regexS = new RegExp('^' + s + '', 'i');
-    var regexG = new RegExp('^' + g + '', 'i');
+    var regexS = new RegExp('^.*' + s + '', 'i');
+    var regexG = new RegExp('^.*' + g + '', 'i');
     if (s != undefined) {
         search = { name: regexS };
     }
@@ -18,6 +18,7 @@ exports.findAll = (req, res) => {
         search["keygenre"] = { $all: regexG };
     }
     if (c != undefined) {
+        c = c.split(",").map(Number);
         search["keyconsole"] = { $all: c };
     }
 
