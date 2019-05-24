@@ -6,6 +6,6 @@
     "\\app\\models",
     "\\app\\routes"
   ],
-  "SelectedNode": "\\app\\controllers\\games.controller.js",
+  "SelectedNode": "\\app\\controllers\\user.controller.js",
   "PreviewInSolutionExplorer": false
 }

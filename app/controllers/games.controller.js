@@ -111,7 +111,7 @@ exports.update = (req, res) => {
                     message: "Note not found with id " + req.params.id
                 });
             }
-            res.send(note);
+            res.send(game);
         }).catch(err => {
             if (err.kind === 'ObjectId') {
                 return res.status(404).send({
