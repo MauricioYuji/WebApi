@@ -1,4 +1,41 @@
 const UserModel = require('../models/user.model.js');
+// Nodejs encryption with CTR
+const crypto = require('crypto');
+const algorithm = 'aes-256-cbc';
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
+
+function encrypt(text) {
+    const secret = 'abcdefg';
+    const hash = crypto.createHmac('sha256', secret)
+        .update(text)
+        .digest('hex');
+    return hash;
+}
+
+generatetoken = (user) => {
+    console.log("GENERATE TOKEN: ", user);
+    var uid = "pnNW2hchWBMUFeQxS1yJZYglx2E2";
+    var resultvalue = 0;
+    var hexstring = "";
+    for (var i = 0; i < uid.length; i++) {
+        var hex = Number(uid.charCodeAt(i)).toString(16);
+        console.log("hex: ", hex);
+        hexstring += hex;
+        resultvalue += parseInt("0x" + hex);
+    }
+    console.log("resultvalue: ", resultvalue);
+
+
+    var hw = encrypt(hexstring);
+    console.log(hw);
+
+    return hw;
+};
+validatetoken = (token) => {
+    console.log("GENERATE TOKEN: ", user);
+    return true;
+};
 getId = (uid) => {
     console.log("uid: ", uid);
     return UserModel.find({ uid: uid }).then(user => {
@@ -36,8 +73,10 @@ exports.findAll = (req, res) => {
 
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
+    generatetoken("asd");
+    console.log("GET USER: ", req.headers.token);
     getId(req.params.id).then(id => {
-        console.log("id: ", id);
+        //console.log("id: ", id);
         UserModel.findById(id)
             .then(user => {
                 if (!user) {
