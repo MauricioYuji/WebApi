@@ -13,7 +13,7 @@ module.exports = (app) => {
 
     app.get('/user', middleware.checkToken, user.findAll);
     app.get('/user/:id', middleware.checkToken, user.findOne);
-    app.post('/user/add', middleware.checkToken, user.create);
+    app.post('/user/add', user.create);
     app.put('/user/edit/:id', middleware.checkToken, user.update);
     app.delete('/user/delete/:id', middleware.checkToken, user.delete);
 

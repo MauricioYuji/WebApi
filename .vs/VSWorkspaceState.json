@@ -3,9 +3,11 @@
     "",
     "\\app",
     "\\app\\controllers",
+    "\\app\\middlewares",
     "\\app\\models",
-    "\\app\\routes"
+    "\\app\\routes",
+    "\\config"
   ],
-  "SelectedNode": "\\app\\controllers\\user.controller.js",
+  "SelectedNode": "\\app\\models\\game.model.js",
   "PreviewInSolutionExplorer": false
 }

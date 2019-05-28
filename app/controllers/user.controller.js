@@ -109,10 +109,11 @@ exports.create = (req, res) => {
 
     // Create a Note
     const user = new UserModel({
-        uid: req.body.uid,
         photoURL: req.body.photoURL,
-        displayName: req.body.displayName,
+        fullname: req.body.fullname,
         email: req.body.email,
+        password: req.body.password,
+        hash_password: req.body.hash_password,
         flagtutorial: req.body.flagtutorial
     });
 
