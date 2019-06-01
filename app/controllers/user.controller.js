@@ -5,47 +5,22 @@ const algorithm = 'aes-256-cbc';
 const key = crypto.randomBytes(32);
 const iv = crypto.randomBytes(16);
 
-function encrypt(text) {
-    const secret = 'abcdefg';
+function encrypt(password, secret) {
     const hash = crypto.createHmac('sha256', secret)
-        .update(text)
+        .update(password)
         .digest('hex');
     return hash;
 }
-
-generatetoken = (user) => {
-    console.log("GENERATE TOKEN: ", user);
-    var uid = "pnNW2hchWBMUFeQxS1yJZYglx2E2";
-    var resultvalue = 0;
-    var hexstring = "";
-    for (var i = 0; i < uid.length; i++) {
-        var hex = Number(uid.charCodeAt(i)).toString(16);
-        console.log("hex: ", hex);
-        hexstring += hex;
-        resultvalue += parseInt("0x" + hex);
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    console.log("resultvalue: ", resultvalue);
+    return result;
+}
 
-
-    var hw = encrypt(hexstring);
-    console.log(hw);
-
-    return hw;
-};
-validatetoken = (token) => {
-    console.log("GENERATE TOKEN: ", user);
-    return true;
-};
-getId = (uid) => {
-    console.log("uid: ", uid);
-    return UserModel.find({ uid: uid }).then(user => {
-        console.log("user: ", user[0].id);
-        return user[0].id;
-    }).catch(err => {
-        return null;
-    });
-};
-// Retrieve and return all notes from the database.
 exports.findAll = (req, res) => {
     var perpage = 10;
     var s = req.query.s;
@@ -75,46 +50,44 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
     generatetoken("asd");
     console.log("GET USER: ", req.headers.token);
-    getId(req.params.id).then(id => {
-        //console.log("id: ", id);
-        UserModel.findById(id)
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                res.send(user);
-            }).catch(err => {
-                if (err.kind === 'ObjectId') {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                return res.status(500).send({
-                    message: "Error retrieving note with id " + req.params.id
+    UserModel.findById(req.params.id)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
                 });
+            }
+            res.send(user);
+        }).catch(err => {
+            if (err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
+                });
+            }
+            return res.status(500).send({
+                message: "Error retrieving note with id " + req.params.id
             });
-    });
+        });
 };
 exports.create = (req, res) => {
     console.log("ADD USER: ", req.body);
     // Validate request
-    console.log("req: ", req.body);
     //if (!req.body.content) {
     //    return res.status(400).send({
     //        message: "Note content can not be empty"
     //    });
     //}
 
-    // Create a Note
+    var hash = makeid(6);
+    var pass = encrypt(req.body.password, hash);
     const user = new UserModel({
-        photoURL: req.body.photoURL,
+        photoURL: "",
         fullname: req.body.fullname,
         email: req.body.email,
-        password: req.body.password,
-        hash_password: req.body.hash_password,
-        flagtutorial: req.body.flagtutorial
+        password: pass,
+        hash_password: hash,
+        flagtutorial: false,
+        emailconfirm: false
     });
 
     // Save Note in the database
@@ -137,57 +110,51 @@ exports.update = (req, res) => {
     //}
 
     // Find note and update it with the request body
-    getId(req.params.id).then(id => {
-        console.log("id: ", id);
 
-        UserModel.findByIdAndUpdate(id, {
-            uid: req.body.uid,
-            photoURL: req.body.photoURL,
-            displayName: req.body.displayName,
-            email: req.body.email,
-            flagtutorial: req.body.flagtutorial
-        }, { new: true })
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                res.send(user);
-            }).catch(err => {
-                if (err.kind === 'ObjectId') {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                return res.status(500).send({
-                    message: "Error updating note with id " + req.params.id
+    UserModel.findByIdAndUpdate(req.params.id, {
+        photoURL: req.body.photoURL,
+        fullname: req.body.fullname,
+        email: req.body.email,
+        flagtutorial: req.body.flagtutorial,
+        emailconfirm: req.body.emailconfirm
+    }, { new: true })
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
                 });
+            }
+            res.send(user);
+        }).catch(err => {
+            if (err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
+                });
+            }
+            return res.status(500).send({
+                message: "Error updating note with id " + req.params.id
             });
-    });
+        });
 };
 
 exports.delete = (req, res) => {
     console.log("DELETE USER: ", req.body);
-    getId(req.params.id).then(id => {
-        console.log("id: ", id);
-        UserModel.findByIdAndRemove(id)
-            .then(user => {
-                if (!user) {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                res.send({ message: "Note deleted successfully!" });
-            }).catch(err => {
-                if (err.kind === 'ObjectId' || err.name === 'NotFound') {
-                    return res.status(404).send({
-                        message: "Note not found with id " + req.params.id
-                    });
-                }
-                return res.status(500).send({
-                    message: "Could not delete note with id " + req.params.id
+    UserModel.findByIdAndRemove(req.params.id)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
                 });
+            }
+            res.send({ message: "Note deleted successfully!" });
+        }).catch(err => {
+            if (err.kind === 'ObjectId' || err.name === 'NotFound') {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
+                });
+            }
+            return res.status(500).send({
+                message: "Could not delete note with id " + req.params.id
             });
-    });
+        });
 };

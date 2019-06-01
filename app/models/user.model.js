@@ -1,10 +1,11 @@
 const mongoose = require('mongoose'),
     bcrypt = require('bcrypt'),
     Schema = mongoose.Schema;
+mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 
 var UserSchema = new Schema({
-
     photoURL: {
         type: String,
         trim: true
@@ -13,6 +14,10 @@ var UserSchema = new Schema({
         type: Boolean,
         default: false
     },
+    emailconfirm: {
+        type: Boolean,
+        default: false
+    }, 
     fullname: {
         type: String,
         trim: true,
@@ -26,20 +31,18 @@ var UserSchema = new Schema({
         required: true
     },
     password: {
-        type: password,
+        type: String,
         trim: true,
         required: true
     },
     hash_password: {
         type: String,
         required: true
-    },
-    created: {
-        type: Date,
-        default: Date.now
-    },
-});
+    }
+}, {
+        timestamps: true
+    });
 UserSchema.methods.comparePassword = function (password) {
     return bcrypt.compareSync(password, this.hash_password);
 };
-mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

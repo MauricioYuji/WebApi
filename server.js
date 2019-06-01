@@ -84,18 +84,12 @@ function main() {
     });
 
 
+    var cors = require('cors');
+    app.use(cors());
     // Routes & Handlers
     app.post('/login', handlers.login);
     app.get('/', middleware.checkToken, handlers.index);
     require('./app/routes/app.routes.js')(app);
-
-    // ........
-    var cors = require('cors');
-    app.use(cors());
-    // Require Notes routes
-
-// ........
-    // listen for requests
     app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 }
 

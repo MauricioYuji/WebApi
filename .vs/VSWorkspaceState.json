@@ -8,6 +8,6 @@
     "\\app\\routes",
     "\\config"
   ],
-  "SelectedNode": "\\app\\models\\game.model.js",
+  "SelectedNode": "\\app\\routes\\app.routes.js",
   "PreviewInSolutionExplorer": false
 }

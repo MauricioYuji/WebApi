@@ -2,12 +2,13 @@ const GameModel = require('../models/game.model.js');
 
 // Retrieve and return all notes from the database.
 exports.findAll = (req, res) => {
-    var perpage = 10;
+    var perpage = parseInt(req.query.perpage);
     var s = req.query.s;
     var g = req.query.g;
     var c = req.query.c;
 
     var search = {};
+    console.log("req.query.perpage: ", req.query.perpage);
     console.log("s: ", s);
     var regexS = new RegExp('^.*' + s + '', 'i');
     var regexG = new RegExp('^.*' + g + '', 'i');
@@ -24,7 +25,7 @@ exports.findAll = (req, res) => {
 
     console.log("c: ", c);
     var query = GameModel.find(search);
-    query.limit(perpage).skip((req.query.page - 1) * perpage)
+    query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 })
         .then(games => {
             GameModel.countDocuments(search, function (err, count) {
                 console.log("Number of users:", count);
