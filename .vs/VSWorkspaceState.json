@@ -8,6 +8,6 @@
     "\\app\\routes",
     "\\config"
   ],
-  "SelectedNode": "\\app\\routes\\app.routes.js",
+  "SelectedNode": "\\app\\controllers\\auth.controller.js",
   "PreviewInSolutionExplorer": false
 }

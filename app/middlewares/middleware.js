@@ -13,20 +13,34 @@ let checkToken = (req, res, next) => {
     if (token) {
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
-                return res.json({
-                    success: false,
-                    message: 'Token is not valid'
+
+                return res.status(400).send({
+                    message: "Token is not valid"
                 });
+                //return res.json({
+                //    success: false,
+                //    message: 'Token is not valid'
+                //});
             } else {
+                let token = jwt.sign({ username: 'Admin' },
+                    config.secret,
+                    {
+                        expiresIn: '24h' // expires in 24 hours
+                    }
+                );
                 req.decoded = decoded;
+                req.token = token;
                 next();
             }
         });
     } else {
-        return res.json({
-            success: false,
-            message: 'Auth token is not supplied'
+        return res.status(400).send({
+            message: "Auth token is not supplied"
         });
+        //return res.json({
+        //    success: false,
+        //    message: 'Auth token is not supplied'
+        //});
     }
 };
 

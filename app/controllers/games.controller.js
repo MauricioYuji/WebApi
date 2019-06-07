@@ -1,4 +1,5 @@
 const GameModel = require('../models/game.model.js');
+const auth = require('../controllers/auth.controller.js');
 
 // Retrieve and return all notes from the database.
 exports.findAll = (req, res) => {
@@ -30,6 +31,7 @@ exports.findAll = (req, res) => {
             GameModel.countDocuments(search, function (err, count) {
                 console.log("Number of users:", count);
                 var json = { "List": games, "Total": count };
+                console.log("req: ", req.token);
                 res.send(json);
             })
         }).catch(err => {

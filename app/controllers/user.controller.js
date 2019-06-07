@@ -1,12 +1,10 @@
 const UserModel = require('../models/user.model.js');
 // Nodejs encryption with CTR
 const crypto = require('crypto');
-const algorithm = 'aes-256-cbc';
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
+const algorithm = 'sha256';
 
 function encrypt(password, secret) {
-    const hash = crypto.createHmac('sha256', secret)
+    const hash = crypto.createHmac(algorithm, secret)
         .update(password)
         .digest('hex');
     return hash;
@@ -48,7 +46,6 @@ exports.findAll = (req, res) => {
 
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
-    generatetoken("asd");
     console.log("GET USER: ", req.headers.token);
     UserModel.findById(req.params.id)
         .then(user => {

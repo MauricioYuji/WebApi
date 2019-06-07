@@ -1,8 +1,12 @@
 module.exports = (app) => {
+    const auth = require('../controllers/auth.controller.js');
     const games = require('../controllers/games.controller.js');
     const user = require('../controllers/user.controller.js');
     const middleware = require('../middlewares/middleware');
 
+    app.post('/login', auth.login);
+    app.post('/token', middleware.checkToken, auth.token);
+    app.get('/', middleware.checkToken, auth.index);
     // Retrieve all Notes
     app.get('/games', middleware.checkToken, games.findAll);
     app.get('/games/:id', middleware.checkToken, games.findOne);
