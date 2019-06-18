@@ -1,7 +1,57 @@
 const GameModel = require('../models/game.model.js');
+//const ImageModel = require('../models/image.model.js');
+const TesteModel = require('../models/teste.model.js');
 const auth = require('../controllers/auth.controller.js');
 
 // Retrieve and return all notes from the database.
+
+
+
+exports.getImages = (req, res) => {
+
+    var query = GameModel.find();
+    query.sort({ name: 1 })
+        .then(games => {
+            GameModel.countDocuments({}, function (err, count) {
+                console.log("Number of users:", count);
+                var json = { "List": games, "Total": count };
+                console.log("req: ", req.token);
+
+                var time = 0;
+
+                for (var i = 0; i < games.length; i++) {
+                    let name = games[i].name.replace(/\//g, '');
+                    let id = games[i]._id;
+
+                    var query = ImageModel.find({ "name": name });
+                    query.sort({ name: 1 })
+                        .then(img => {
+                            if (img.length > 0) {
+                                GameModel.findByIdAndUpdate(id, {
+                                    img: img[0].id
+                                }, { new: true })
+                                    .then(game => {
+                                        console.log("name: ", name);
+                                    }).catch(err => {
+                                    });
+                            }
+
+
+                        }).catch(err => {
+                            //res.status(500).send({
+                            //    message: err.message || "Some error occurred while retrieving notes."
+                            //});
+                        });
+                }
+                //res.send(json);
+            });
+        }).catch(err => {
+            //res.status(500).send({
+            //    message: err.message || "Some error occurred while retrieving notes."
+            //});
+        });
+};
+
 exports.findAll = (req, res) => {
     var perpage = parseInt(req.query.perpage);
     var s = req.query.s;
@@ -26,12 +76,12 @@ exports.findAll = (req, res) => {
 
     console.log("c: ", c);
     var query = GameModel.find(search);
-    query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 })
-        .then(games => {
+    query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 }).then(games => {
             GameModel.countDocuments(search, function (err, count) {
                 console.log("Number of users:", count);
                 var json = { "List": games, "Total": count };
                 console.log("req: ", req.token);
+                console.log("json: ", json);
                 res.send(json);
             })
         }).catch(err => {
@@ -40,7 +90,6 @@ exports.findAll = (req, res) => {
             });
         });
 };
-
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
     GameModel.findById(req.params.id)
