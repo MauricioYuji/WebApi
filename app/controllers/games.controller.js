@@ -74,21 +74,26 @@ exports.findAll = (req, res) => {
         search["keyconsole"] = { $all: c };
     }
 
+    //search["img"] = {
+    //    $not: {
+    //        $eq: ""
+    //    }
+    //};
     console.log("c: ", c);
-    var query = GameModel.find(search);
+    var query = GameModel.find(search).populate("img", null);
     query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 }).then(games => {
-            GameModel.countDocuments(search, function (err, count) {
-                console.log("Number of users:", count);
-                var json = { "List": games, "Total": count };
-                console.log("req: ", req.token);
-                console.log("json: ", json);
-                res.send(json);
-            })
-        }).catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving notes."
-            });
+        GameModel.countDocuments(search, function (err, count) {
+            console.log("Number of users:", count);
+            var json = { "List": games, "Total": count };
+            console.log("req: ", req.token);
+            console.log("json: ", json);
+            res.send(json);
+        })
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving notes."
         });
+    });
 };
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
