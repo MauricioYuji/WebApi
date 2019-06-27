@@ -26,6 +26,7 @@
 
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const ImageModel = require('./image.model.js');
 
 const GameSchema = Schema({
     _id: Schema.Types.ObjectId,
@@ -40,6 +41,7 @@ const ImageSchema = Schema({
     img: String
 });
 
-const Image = mongoose.model('Image', ImageSchema);
+const Image = ImageModel;
 module.exports = mongoose.model('Game', GameSchema);
+//module.exports = mongoose.model('Image', ImageSchema);
 //const Game = mongoose.model('Game', GameSchema);

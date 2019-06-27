@@ -9,7 +9,12 @@ const auth = require('../controllers/auth.controller.js');
 
 exports.getImages = (req, res) => {
 
-    var query = GameModel.find();
+    var search = {};
+    search["img"] = {
+        $exists: true, $not: { $not: { $eq: "" } }
+    };
+    console.log("search: ", search);
+    var query = GameModel.find(search);
     query.sort({ name: 1 })
         .then(games => {
             GameModel.countDocuments({}, function (err, count) {
@@ -22,26 +27,36 @@ exports.getImages = (req, res) => {
                 for (var i = 0; i < games.length; i++) {
                     let name = games[i].name.replace(/\//g, '');
                     let id = games[i]._id;
+                    console.log("id: ", id);
+                    console.log("name: ", name);
 
-                    var query = ImageModel.find({ "name": name });
-                    query.sort({ name: 1 })
-                        .then(img => {
-                            if (img.length > 0) {
-                                GameModel.findByIdAndUpdate(id, {
-                                    img: img[0].id
-                                }, { new: true })
-                                    .then(game => {
-                                        console.log("name: ", name);
-                                    }).catch(err => {
-                                    });
-                            }
-
-
+                    GameModel.findByIdAndUpdate(id, {
+                        img: undefined
+                    }, { new: true })
+                        .then(game => {
+                            console.log("name: ", name);
                         }).catch(err => {
-                            //res.status(500).send({
-                            //    message: err.message || "Some error occurred while retrieving notes."
-                            //});
                         });
+
+                    //var query = ImageModel.find({ "name": name });
+                    //query.sort({ name: 1 })
+                    //    .then(img => {
+                    //        if (img.length > 0) {
+                    //            GameModel.findByIdAndUpdate(id, {
+                    //                img: img[0].id
+                    //            }, { new: true })
+                    //                .then(game => {
+                    //                    console.log("name: ", name);
+                    //                }).catch(err => {
+                    //                });
+                    //        }
+
+
+                    //    }).catch(err => {
+                    //        //res.status(500).send({
+                    //        //    message: err.message || "Some error occurred while retrieving notes."
+                    //        //});
+                    //    });
                 }
                 //res.send(json);
             });

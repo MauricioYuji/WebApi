@@ -1,7 +1,7 @@
 module.exports = (app) => {
     const auth = require('../controllers/auth.controller.js');
     const games = require('../controllers/games.controller.js');
-    //const images = require('../controllers/images.controller.js');
+    const images = require('../controllers/images.controller.js');
     const user = require('../controllers/user.controller.js');
     const middleware = require('../middlewares/middleware');
 
@@ -24,9 +24,9 @@ module.exports = (app) => {
     app.delete('/user/delete/:id', middleware.checkToken, user.delete);
 
 
-    //app.get('/images', middleware.checkToken, images.findAll);
-    //app.get('/images/:id', middleware.checkToken, images.findOne);
-    //app.post('/images/add', middleware.checkToken, images.create);
-    //app.put('/images/edit/:id', middleware.checkToken, images.update);
-    //app.delete('/images/delete/:id', middleware.checkToken, images.delete);
+    app.get('/images', middleware.checkToken, images.findAll);
+    app.get('/images/:id', middleware.checkToken, images.findOne);
+    app.post('/images/add', middleware.checkToken, images.create);
+    app.put('/images/edit/:id', middleware.checkToken, images.update);
+    app.delete('/images/delete/:id', middleware.checkToken, images.delete);
 }
