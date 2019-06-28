@@ -29,7 +29,6 @@ const Schema = mongoose.Schema;
 const ImageModel = require('./image.model.js');
 
 const GameSchema = Schema({
-    _id: Schema.Types.ObjectId,
     name: String,
     keygenre: Array,
     keyconsole: Array,

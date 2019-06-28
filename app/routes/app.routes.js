@@ -9,7 +9,7 @@ module.exports = (app) => {
     app.post('/token', middleware.checkToken, auth.token);
     app.get('/', middleware.checkToken, auth.index);
     // Retrieve all Notes
-    app.get('/gamesimages', games.getImages);
+    //app.get('/gamesimages', games.getImages);
     app.get('/games', middleware.checkToken, games.findAll);
     app.get('/games/:id', middleware.checkToken, games.findOne);
     app.post('/games/add', middleware.checkToken, games.create);
