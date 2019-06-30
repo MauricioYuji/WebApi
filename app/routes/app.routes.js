@@ -1,9 +1,12 @@
 module.exports = (app) => {
+    const teste = require('../controllers/teste.controller.js');
     const auth = require('../controllers/auth.controller.js');
     const games = require('../controllers/games.controller.js');
     const images = require('../controllers/images.controller.js');
     const user = require('../controllers/user.controller.js');
     const middleware = require('../middlewares/middleware');
+
+    app.get('/teste', teste.default);
 
     app.post('/login', auth.login);
     app.post('/token', middleware.checkToken, auth.token);
