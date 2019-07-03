@@ -44,18 +44,21 @@ exports.login = (req, res) => {
 
     UserModel.find({ email: username }).then(user => {
         user = user[0];
-        console.log("user: ", user);
         var pass = encrypt(password, user.hash_password);
-        console.log("pass: ", pass);
-        console.log("user.password: ", user.password);
         if (pass === user.password) {
-            console.log("USER VALID");
-            let token = generateToken(username);
+            var userobj = {
+                flagtutorial: user.flagtutorial,
+                flagconfirm: user.emailconfirm,
+                photo: user.photoURL,
+                email: user.email,
+                name: user.fullname,
+                token: generateToken(username)
+            };
             // return the JWT token for the future API calls
             res.json({
                 success: true,
                 message: 'Authentication successful!',
-                token: token
+                data: JSON.stringify(userobj)
             });
         } else {
             console.log("USER INVALID");
