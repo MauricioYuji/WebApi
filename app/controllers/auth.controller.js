@@ -5,13 +5,13 @@ const crypto = require('crypto');
 const algorithm = 'sha256';
 
 function encrypt(password, secret) {
-    console.log("password:", password);
-    console.log("secret:", secret);
-    console.log("algorithm:", algorithm);
+    //console.log("password:", password);
+    //console.log("secret:", secret);
+    //console.log("algorithm:", algorithm);
     const hash = crypto.createHmac(algorithm, secret)
         .update(password)
         .digest('hex');
-    console.log("hash:", hash);
+    //console.log("hash:", hash);
     return hash;
 }
 function generateToken(username) {
@@ -40,20 +40,22 @@ exports.login = (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
 
-    console.log("LOGIN");
+    //console.log("LOGIN");
 
     UserModel.find({ email: username }).then(user => {
         user = user[0];
         var pass = encrypt(password, user.hash_password);
         if (pass === user.password) {
+            var token = generateToken(username);
             var userobj = {
-                flagtutorial: user.flagtutorial,
-                flagconfirm: user.emailconfirm,
                 photo: user.photoURL,
                 email: user.email,
                 name: user.fullname,
-                token: generateToken(username)
+                id: user._id,
+                flagtutorial: user.flagtutorial,
+                token: token
             };
+            //console.log("token: ", token);
             // return the JWT token for the future API calls
             res.json({
                 success: true,

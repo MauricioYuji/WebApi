@@ -1,2 +1,8 @@
 
 node_modules/
+
+\.vs/slnx\.sqlite
+
+\.vs/WebApi/v16/\.suo
+
+\.vs/
