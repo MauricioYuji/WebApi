@@ -1,7 +1,10 @@
-const UserModel = require('../models/user.model.js');
+﻿const UserModel = require('../models/user.model.js');
 // Nodejs encryption with CTR
 const crypto = require('crypto');
 const algorithm = 'sha256';
+const email = require('../controllers/email.controller.js');
+
+const authController = require('../controllers/auth.controller.js');
 
 function encrypt(password, secret) {
     const hash = crypto.createHmac(algorithm, secret)
@@ -10,6 +13,7 @@ function encrypt(password, secret) {
     return hash;
 }
 function makeid(length) {
+
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
@@ -18,6 +22,9 @@ function makeid(length) {
     }
     return result;
 }
+exports.makeid = (length) => {
+    return makeid(length);
+};
 
 exports.findAll = (req, res) => {
     var perpage = 10;
@@ -66,6 +73,41 @@ exports.findOne = (req, res) => {
             });
         });
 };
+
+async function createuser(user) {
+    console.log("user: ", user);
+    var obj = { status: 0, msg: "", data: null, type: 0 };
+    // Save Note in the database
+    return UserModel.find({ email: user.email }).then(u => {
+        if (u.length == 0) {
+            return user.save().then(data => {
+                var token = encrypt(user.id, user.hash_password);
+                email.send(user.email, user.id + "-" + token);
+                //res.send(data);
+
+
+                obj.status = 200;
+                obj.msg = "Usuário criado, acesse seu email para confirmar a conta";
+                obj.type = 1;
+                return obj;
+
+            }).catch(err => {
+                console.log("Ocorreu algum erro");
+                obj.status = 401;
+                obj.msg = "Ocorreu algum erro no cadastro, tente novamente";
+                return obj;
+            });
+        } else {
+            console.log("Usuario existente");
+            obj.status = 401;
+            obj.msg = "Esse usuário já está cadastrado, caso tenha esquecido a senha, clique na opção 'Esqueci a senha'";
+            return obj;
+        }
+    });
+};
+exports.createuser = (user) => {
+    return createuser(user);
+};
 exports.create = (req, res) => {
     console.log("ADD USER: ", req.body);
     // Validate request
@@ -74,28 +116,131 @@ exports.create = (req, res) => {
     //        message: "Note content can not be empty"
     //    });
     //}
-
     var hash = makeid(6);
     var pass = encrypt(req.body.password, hash);
     const user = new UserModel({
-        photoURL: "",
+        photoURL: req.body.photoURL,
         fullname: req.body.fullname,
         email: req.body.email,
         password: pass,
         hash_password: hash,
         flagtutorial: false,
-        emailconfirm: false
+        emailconfirm: false,
+        isfacebook: req.body.isfacebook
+    });
+    // Save Note in the database
+    createuser(user).then(retorno => {
+        send(res, retorno);
+    });
+};
+
+
+async function send(res, retorno) {
+    if (retorno.status === 200) {
+
+        res.json({
+            success: true,
+            message: retorno.msg,
+            type: retorno.type
+        });
+    } else {
+        res.json({
+            success: false,
+            type: retorno.type,
+            message: retorno.msg
+        });
+    }
+}
+exports.sendconfirm = (req, res) => {
+    console.log("SEND CONFIRM USER: ", req.body.email);
+
+    UserModel.find({ email: req.body.email }).then(u => {
+        console.log("u: ", u);
+        if (u.length > 0) {
+            var user = u[0];
+            var token = encrypt(user.id, user.hash_password);
+            email.send(user.email, user.id + "-" + token);
+
+            res.json({
+                success: true,
+                message: "Confirmação enviada com sucesso, verifique seu email."
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Email não cadastrado, tente outro!"
+            });
+        }
+
+    }).catch(err => {
+        if (err.kind === 'ObjectId') {
+            return res.status(404).send({
+                message: "Note not found with id " + req.params.id
+            });
+        }
+        return res.status(500).send({
+            message: "Error retrieving note with id " + req.params.id
+        });
     });
 
-    // Save Note in the database
-    user.save()
-        .then(data => {
-            res.send(data);
+};
+exports.confirm = (req, res) => {
+    console.log("CONFIRM USER: ", req.params.token);
+    var data = req.params.token.split("-");
+    var id = data[0];
+    var token = data[1];
+    console.log("id: ", id);
+    console.log("token: ", token);
+
+
+    UserModel.findById(id)
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: "Note not found with id " + id
+                });
+            }
+            var checktoken = encrypt(id, user.hash_password);
+            if (checktoken == token) {
+                UserModel.findByIdAndUpdate(id, {
+                    emailconfirm: true
+                }, { new: true })
+                    .then(user => {
+                        if (!user) {
+                            return res.status(404).send({
+                                message: "Note not found with id " + req.params.id
+                            });
+                        }
+                        res.send(true);
+                    }).catch(err => {
+                        if (err.kind === 'ObjectId') {
+                            return res.status(404).send({
+                                message: "Note not found with id " + req.params.id
+                            });
+                        }
+                        return res.status(500).send({
+                            message: "Error updating note with id " + req.params.id
+                        });
+                    });
+            } else {
+                return res.status(404).send({
+                    message: "Token invalido"
+                });
+            }
+
+
         }).catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the Note."
+            if (err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "Note not found with id " + id
+                });
+            }
+            return res.status(500).send({
+                message: "Error retrieving note with id " + id
             });
         });
+
+
 };
 exports.update = (req, res) => {
     console.log("EDIT USER: ", req.body);
@@ -154,4 +299,8 @@ exports.delete = (req, res) => {
                 message: "Could not delete note with id " + req.params.id
             });
         });
+};
+exports.resetpassword = (req, res) => {
+    console.log("RESET USER: ", req.body);
+
 };

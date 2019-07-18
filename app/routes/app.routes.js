@@ -9,10 +9,11 @@ module.exports = (app) => {
     app.get('/teste', teste.default);
 
     app.post('/login', auth.login);
-    app.post('/token', middleware.checkToken, auth.token);
+    app.post('/loginwithfacebook', auth.loginfacebook);
+    app.post('/signinwithfacebook', auth.signinfacebook);
+    app.post('/token', middleware.checkToken, auth.gettoken);
     app.get('/', middleware.checkToken, auth.index);
-    // Retrieve all Notes
-    //app.get('/gamesimages', games.getImages);
+
     app.get('/games', middleware.checkToken, games.findAll);
     app.get('/games/:id', middleware.checkToken, games.findOne);
     app.post('/games/add', middleware.checkToken, games.create);
@@ -22,7 +23,11 @@ module.exports = (app) => {
 
     app.get('/user', middleware.checkToken, user.findAll);
     app.get('/user/:id', middleware.checkToken, user.findOne);
+
     app.post('/user/add', user.create);
+    app.post('/user/sendconfirm', user.sendconfirm);
+    app.post('/user/resetpassword', user.resetpassword);
+    app.get('/user/confirm/:token', user.confirm);
     app.put('/user/edit/:id', middleware.checkToken, user.update);
     app.delete('/user/delete/:id', middleware.checkToken, user.delete);
 

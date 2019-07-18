@@ -10,6 +10,10 @@ var UserSchema = new Schema({
         type: String,
         trim: true
     },
+    isfacebook: {
+        type: Boolean,
+        default: false
+    },
     flagtutorial: {
         type: Boolean,
         default: false
