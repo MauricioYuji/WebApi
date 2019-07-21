@@ -1,7 +1,7 @@
 ﻿const nodemailer = require('nodemailer');
 
 
-exports.send = (email, token) => {
+exports.send = (email, message) => {
     console.log("SEND EMAIL: ", email);
 
     var transporter = nodemailer.createTransport({
@@ -16,7 +16,7 @@ exports.send = (email, token) => {
         from: 'listupapp@outlook.com',
         to: email,
         subject: 'ListUP - confirmação de email',
-        text: '<a href="http://192.168.15.12:3000/user/confirm/' + token+'">Clique aqui para confirmar sua conta</a>'
+        text: message
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

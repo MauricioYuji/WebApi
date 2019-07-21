@@ -1,0 +1,58 @@
+<html>
+<head>
+    <title>Esqueci a senha</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <style>
+    body {
+        padding: 20px;
+    }
+
+    form {
+        display: block;
+    }
+
+        form input {
+            display: block;
+            margin: 0 0 10px 0;
+        }
+
+        form button {
+            margin: 10px 0;
+        }
+
+    </style>
+    <script>
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+        };
+        $(function () {
+            var token = getUrlParameter('token');
+            $("#token").val(token);
+        });
+    </script>
+</head>
+<body>
+    <form>
+        <input type="hidden" id="token" />
+        <label>Nova senha</label>
+        <input type="password" />
+        <label>Confirmar senha</label>
+        <input type="password" />
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

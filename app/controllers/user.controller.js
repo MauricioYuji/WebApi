@@ -158,8 +158,9 @@ exports.sendconfirm = (req, res) => {
         console.log("u: ", u);
         if (u.length > 0) {
             var user = u[0];
-            var token = encrypt(user.id, user.hash_password);
-            email.send(user.email, user.id + "-" + token);
+            var token = encrypt(user.id + user.password, user.hash_password);
+            var html = '<a href="http://192.168.15.12:3000/user/confirm/' + user.id + "-" + token + '">Clique aqui para confirmar sua conta</a>';
+            email.send(user.email, html);
 
             res.json({
                 success: true,
@@ -183,6 +184,99 @@ exports.sendconfirm = (req, res) => {
         });
     });
 
+};
+exports.resetpassword = (req, res) => {
+    console.log("RESET USER: ", req.body);
+
+    UserModel.find({ email: req.body.email }).then(u => {
+        console.log("u: ", u);
+        if (u.length > 0) {
+            var user = u[0];
+            if (!user.isfacebook) {
+                var token = encrypt(user.id + user.password, user.hash_password);
+                var html = '<a href="http://192.168.15.12:3000/user/newpassword/' + user.id + "-" + token + '">Clique aqui para definir sua nova senha</a>';
+                email.send(user.email, html);
+
+                res.json({
+                    success: true,
+                    message: "Confirme seu email para trocar a senha!"
+                });
+            } else {
+                res.json({
+                    success: false,
+                    message: "Este email está cadastrado via facebook, para logar basta clicar em \"Entrar com o facebook\" e logar na sua conta do facebook"
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                message: "Email não cadastrado, tente outro!"
+            });
+        }
+
+    }).catch(err => {
+        if (err.kind === 'ObjectId') {
+            return res.status(404).send({
+                message: "Note not found with id " + req.params.id
+            });
+        }
+        return res.status(500).send({
+            message: "Error retrieving note with id " + req.params.id
+        });
+    });
+
+};
+
+exports.changepassword = (req, res) => {
+    console.log("CHANGE PASSWORD: ", req.body.token);
+    var id = req.body.token.split("-")[0];
+    var token = req.body.token.split("-")[1];
+
+    UserModel.findById(id).then(user => {
+
+        var checktoken = encrypt(user.id + user.password, user.hash_password);
+        if (token == checktoken) {
+            var password = encrypt(req.body.password, user.hash_password);
+            UserModel.findByIdAndUpdate(id, {
+                password: password
+            }, { new: true }).then(user => {
+                if (!user) {
+                    res.json({
+                        success: false,
+                        message: "Email inválido"
+                    });
+                }
+                res.json({
+                    success: true,
+                    message: "Senha alterada com sucesso"
+                });
+            }).catch(err => {
+                if (err.kind === 'ObjectId') {
+                    return res.status(404).send({
+                        message: "Note not found with id " + req.params.id
+                    });
+                }
+                return res.status(500).send({
+                    message: "Error updating note with id " + req.params.id
+                });
+            });
+        } else {
+            res.json({
+                success: false,
+                message: "Token invalido"
+            });
+        }
+
+    }).catch(err => {
+        if (err.kind === 'ObjectId') {
+            return res.status(404).send({
+                message: "Note not found with id " + id
+            });
+        }
+        return res.status(500).send({
+            message: "Error retrieving note with id " + id
+        });
+    });
 };
 exports.confirm = (req, res) => {
     console.log("CONFIRM USER: ", req.params.token);
@@ -299,8 +393,4 @@ exports.delete = (req, res) => {
                 message: "Could not delete note with id " + req.params.id
             });
         });
-};
-exports.resetpassword = (req, res) => {
-    console.log("RESET USER: ", req.body);
-
 };
