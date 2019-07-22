@@ -28,7 +28,8 @@ module.exports = (app) => {
     app.post('/user/add', user.create);
     app.post('/user/sendconfirm', user.sendconfirm);
     app.post('/user/resetpassword', user.resetpassword);
-    app.post('/user/changepassword', user.changepassword);
+    app.post('/user/sendpassword', user.sendpassword);
+    app.get('/changepassword', user.changepassword);
     app.get('/user/confirm/:token', user.confirm);
     app.put('/user/edit/:id', middleware.checkToken, user.update);
     app.delete('/user/delete/:id', middleware.checkToken, user.delete);

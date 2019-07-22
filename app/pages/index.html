@@ -6,23 +6,22 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <style>
-    body {
-        padding: 20px;
-    }
+        body {
+            padding: 20px;
+        }
 
-    form {
-        display: block;
-    }
-
-        form input {
+        form {
             display: block;
-            margin: 0 0 10px 0;
         }
 
-        form button {
-            margin: 10px 0;
-        }
+            form input {
+                display: block;
+                margin: 0 0 10px 0;
+            }
 
+            form button {
+                margin: 10px 0;
+            }
     </style>
     <script>
         var getUrlParameter = function getUrlParameter(sParam) {
@@ -46,13 +45,50 @@
     </script>
 </head>
 <body>
-    <form>
-        <input type="hidden" id="token" />
-        <label>Nova senha</label>
-        <input type="password" />
-        <label>Confirmar senha</label>
-        <input type="password" />
-        <button type="submit">Enviar</button>
-    </form>
+    <div id="form">
+        <form id="sendpassword" action="/user/sendpassword">
+            <input type="hidden" name="token" id="token" />
+            <label>Nova senha</label>
+            <input id="password" name="password" type="password" />
+            <label>Confirmar senha</label>
+            <input id="confirm_password" type="password" />
+            <button type="submit">Enviar</button>
+        </form>
+        <div id="feedback"></div>
+    </div>
+    <script>
+        $("#sendpassword").on("submit", function (e) {
+            e.preventDefault();
+            var password = $("#password").val();
+            var confirm_password = $("#confirm_password").val();
+            var token = $("#token").val();
+            if (password == confirm_password) {
+                var action = $("#sendpassword").attr("action");
+                var data = { token: token, password: password };
+                console.log($(this).serialize());
+                $.ajax({
+                    url: action,
+                    dataType: 'JSON',
+                    type: 'post',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: $(this).serialize(),
+                    success: function (data, textStatus, jQxhr) {
+                        //$('#response pre').html( data );
+                        console.log(data);
+                        if (data.success)
+                            $("#form").html(data.message);
+                        else
+                            $("#feedback").html(data.message);
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        console.log(errorThrown);
+                    }
+                });
+
+            } else {
+                $("#feedback").html("As senhas não confirmam");
+            }
+        });
+    </script>
 </body>
 </html>

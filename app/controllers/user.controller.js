@@ -158,7 +158,7 @@ exports.sendconfirm = (req, res) => {
         console.log("u: ", u);
         if (u.length > 0) {
             var user = u[0];
-            var token = encrypt(user.id + user.password, user.hash_password);
+            var token = encrypt(user.id, user.hash_password);
             var html = '<a href="http://192.168.15.12:3000/user/confirm/' + user.id + "-" + token + '">Clique aqui para confirmar sua conta</a>';
             email.send(user.email, html);
 
@@ -194,12 +194,12 @@ exports.resetpassword = (req, res) => {
             var user = u[0];
             if (!user.isfacebook) {
                 var token = encrypt(user.id + user.password, user.hash_password);
-                var html = '<a href="http://192.168.15.12:3000/user/newpassword/' + user.id + "-" + token + '">Clique aqui para definir sua nova senha</a>';
+                var html = '<a href="http://192.168.15.12:3000/changepassword/?token=' + user.id + "-" + token + '">Clique aqui para definir sua nova senha</a>';
                 email.send(user.email, html);
 
                 res.json({
                     success: true,
-                    message: "Confirme seu email para trocar a senha!"
+                    message: "Confira seu email para trocar a senha!"
                 });
             } else {
                 res.json({
@@ -226,9 +226,14 @@ exports.resetpassword = (req, res) => {
     });
 
 };
+const path = require('path');
 
 exports.changepassword = (req, res) => {
-    console.log("CHANGE PASSWORD: ", req.body.token);
+    console.log("CHANGE PASSWORD PAGE");
+    res.sendFile('index.html', { root: path.join(__dirname, '../pages') });
+};
+exports.sendpassword = (req, res) => {
+    console.log("CHANGE PASSWORD: ", req.body);
     var id = req.body.token.split("-")[0];
     var token = req.body.token.split("-")[1];
 
@@ -305,7 +310,7 @@ exports.confirm = (req, res) => {
                                 message: "Note not found with id " + req.params.id
                             });
                         }
-                        res.send(true);
+                        res.sendFile('success.html', { root: path.join(__dirname, '../pages') });
                     }).catch(err => {
                         if (err.kind === 'ObjectId') {
                             return res.status(404).send({
