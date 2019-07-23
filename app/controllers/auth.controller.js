@@ -4,30 +4,14 @@ const UserModel = require('../models/user.model.js');
 const crypto = require('crypto');
 const algorithm = 'sha256';
 const userController = require('../controllers/user.controller.js');
+const baseController = require('../controllers/base.controller');
 
-function encrypt(password, secret) {
-    //console.log("password:", password);
-    //console.log("secret:", secret);
-    //console.log("algorithm:", algorithm);
-    const hash = crypto.createHmac(algorithm, secret)
-        .update(password)
-        .digest('hex');
-    //console.log("hash:", hash);
-    return hash;
-}
-function generateToken(username) {
-    return jwt.sign({ username: username },
-        config.secret,
-        {
-            expiresIn: '24h' // expires in 24 hours
-        }
-    );
-}
+
 exports.token = (username) => {
-    return token = generateToken(username);
+    return token = baseController.generateToken(username);
 };
 exports.gettoken = (req, res) => {
-    var token = generateToken(req.body.username);
+    var token = baseController.generateToken(req.body.username);
     res.json({
         success: true,
         message: 'Authentication successful!',
@@ -49,7 +33,7 @@ exports.signinfacebook = (req, res) => {
 
 
         var hash = userController.makeid(6);
-        var pass = encrypt(req.body.password, hash);
+        var pass = baseController.encrypt(req.body.password, hash);
         const u = new UserModel({
             photoURL: req.body.photoURL,
             fullname: req.body.fullname,
@@ -64,7 +48,7 @@ exports.signinfacebook = (req, res) => {
         console.log("LOGIN: ", u);
 
         userController.createuser(u).then(retorno => {
-            send(res, retorno);
+            baseController.send(res, retorno);
         });
 
     }).catch(err => {
@@ -88,13 +72,13 @@ exports.loginfacebook = (req, res) => {
                 password: req.body.password
             };
             login(objuser).then(retorno => {
-                send(res, retorno);
+                baseController.send(res, retorno);
             });
         } else {
             console.log("Usuario não existe");
 
             var hash = userController.makeid(6);
-            var pass = encrypt(req.body.password, hash);
+            var pass = baseController.encrypt(req.body.password, hash);
             const u = new UserModel({
                 photoURL: req.body.photoURL,
                 fullname: req.body.fullname,
@@ -109,7 +93,7 @@ exports.loginfacebook = (req, res) => {
             console.log("LOGIN: ", u);
 
             userController.createuser(u).then(retorno => {
-                send(res, retorno);
+                baseController.send(res, retorno);
             });
         }
     }).catch(err => {
@@ -127,7 +111,7 @@ async function login(userobj) {
         var obj = { status: 0, msg: "", data: null, type: 0 };
         if (user.length > 0) {
             user = user[0];
-            var pass = encrypt(userobj.password, user.hash_password);
+            var pass = baseController.encrypt(userobj.password, user.hash_password);
 
             if (pass === user.password) {
                 if (user.emailconfirm) {
@@ -162,41 +146,6 @@ async function login(userobj) {
         return obj;
     });
 }
-async function send(res, retorno) {
-    if (retorno.status === 200) {
-        if (retorno.data != null) {
-            var token = generateToken(retorno.data.email);
-            var user = {
-                photo: retorno.data.photoURL,
-                email: retorno.data.email,
-                name: retorno.data.fullname,
-                id: retorno.data._id,
-                flagtutorial: retorno.data.flagtutorial,
-                emailconfirm: retorno.data.emailconfirm,
-                token: token
-            };
-
-            res.json({
-                success: true,
-                message: retorno.msg,
-                type: retorno.type,
-                data: JSON.stringify(user)
-            });
-        } else {
-            res.json({
-                success: true,
-                message: retorno.msg,
-                type: retorno.type
-            });
-        }
-    } else {
-        res.json({
-            success: false,
-            type: retorno.type,
-            message: retorno.msg
-        });
-    }
-}
 exports.login = (req, res) => {
 
     var objuser = {
@@ -206,6 +155,6 @@ exports.login = (req, res) => {
 
 
     login(objuser).then(retorno => {
-        send(res, retorno);
+        baseController.send(res, retorno);
     });
 };

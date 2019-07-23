@@ -5,6 +5,7 @@ const algorithm = 'sha256';
 const email = require('../controllers/email.controller.js');
 
 const authController = require('../controllers/auth.controller.js');
+const baseController = require('../controllers/base.controller.js');
 
 function encrypt(password, secret) {
     const hash = crypto.createHmac(algorithm, secret)
@@ -54,6 +55,7 @@ exports.findAll = (req, res) => {
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
     console.log("GET USER: ", req.headers.token);
+    var obj = { status: 0, msg: "", data: null, type: 0 };
     UserModel.findById(req.params.id)
         .then(user => {
             if (!user) {
@@ -61,7 +63,20 @@ exports.findOne = (req, res) => {
                     message: "Note not found with id " + req.params.id
                 });
             }
-            res.send(user);
+
+            var token = baseController.generateToken(user.email);
+            console.log("token: ", token);
+            var userobj = {
+                photo: user.photoURL,
+                email: user.email,
+                name: user.fullname,
+                id: user._id,
+                flagtutorial: user.flagtutorial,
+                emailconfirm: user.emailconfirm,
+                token: token
+            };
+            console.log("userobj: ", userobj);
+            res.send(userobj);
         }).catch(err => {
             if (err.kind === 'ObjectId') {
                 return res.status(404).send({
@@ -339,6 +354,34 @@ exports.confirm = (req, res) => {
             });
         });
 
+
+};
+
+exports.tutorial = (req, res) => {
+    console.log("TUTORIAL: ", req.body.id);
+    UserModel.findByIdAndUpdate(req.body.id, {
+        flagtutorial: true
+    }, { new: true })
+        .then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
+                });
+            }
+            res.json({
+                success: true,
+                message: "Tutorial finalizado"
+            });
+        }).catch(err => {
+            if (err.kind === 'ObjectId') {
+                return res.status(404).send({
+                    message: "Note not found with id " + req.params.id
+                });
+            }
+            return res.status(500).send({
+                message: "Error updating note with id " + req.params.id
+            });
+        });
 
 };
 exports.update = (req, res) => {

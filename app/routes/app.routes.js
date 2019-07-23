@@ -31,6 +31,7 @@ module.exports = (app) => {
     app.post('/user/sendpassword', user.sendpassword);
     app.get('/changepassword', user.changepassword);
     app.get('/user/confirm/:token', user.confirm);
+    app.post('/user/tutorial', user.tutorial);
     app.put('/user/edit/:id', middleware.checkToken, user.update);
     app.delete('/user/delete/:id', middleware.checkToken, user.delete);
 
