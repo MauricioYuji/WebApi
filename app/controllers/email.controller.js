@@ -1,8 +1,7 @@
 ﻿const nodemailer = require('nodemailer');
 
 
-exports.send = (email, message) => {
-    console.log("SEND EMAIL: ", email);
+exports.send = (email, message, title) => {
 
     var transporter = nodemailer.createTransport({
         service: 'outlook',
@@ -15,7 +14,7 @@ exports.send = (email, message) => {
     var mailOptions = {
         from: 'listupapp@outlook.com',
         to: email,
-        subject: 'ListUP - confirmação de email',
+        subject: 'ListUP - ' + title,
         text: message
     };
 

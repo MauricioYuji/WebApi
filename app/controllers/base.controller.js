@@ -2,52 +2,47 @@
 let jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const algorithm = 'sha256';
-function generateToken(username) {
+const path = require('path');
 
-    return jwt.sign({ username: username },
-        config.secret,
-        {
-            expiresIn: '24h' // expires in 24 hours
-        }
-    );
-}
+exports.makeid = (length) => {
+
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+};
 exports.encrypt = (password, secret) => {
-    //console.log("password:", password);
-    //console.log("secret:", secret);
-    //console.log("algorithm:", algorithm);
     const hash = crypto.createHmac(algorithm, secret)
         .update(password)
         .digest('hex');
-    //console.log("hash:", hash);
     return hash;
 };
 exports.generateToken = (username) => {
-    return generateToken(username);
+    return jwt.sign({ username: username },
+        config.secret,
+        {
+            expiresIn: '1m' // expires in 24 hours
+        }
+    );
 };
 exports.send = (res, retorno) => {
     if (retorno.status === 200) {
         if (retorno.data != null) {
-            var token = generateToken(retorno.data.email);
-            var user = {
-                photo: retorno.data.photoURL,
-                email: retorno.data.email,
-                name: retorno.data.fullname,
-                id: retorno.data._id,
-                flagtutorial: retorno.data.flagtutorial,
-                emailconfirm: retorno.data.emailconfirm,
-                token: token
-            };
-
             res.json({
                 success: true,
+                token: retorno.token,
                 message: retorno.msg,
                 type: retorno.type,
-                data: JSON.stringify(user)
+                data: JSON.stringify(retorno.data)
             });
         } else {
             res.json({
                 success: true,
                 message: retorno.msg,
+                token: retorno.token,
                 type: retorno.type
             });
         }
@@ -57,5 +52,12 @@ exports.send = (res, retorno) => {
             type: retorno.type,
             message: retorno.msg
         });
+    }
+};
+exports.sendfile = (res, retorno) => {
+    if (retorno.status === 200) {
+        res.sendFile(retorno.data, { root: path.join(__dirname, '../pages') });
+    } else {
+        res.sendFile('error.html', { root: path.join(__dirname, '../pages') });
     }
 }

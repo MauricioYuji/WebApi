@@ -1,5 +1,8 @@
 let jwt = require('jsonwebtoken');
 const config = require('../../config/config');
+const baseController = require('../controllers/base.controller');
+
+const obj = { status: 0, msg: "", data: null, type: 0 };
 
 let checkToken = (req, res, next) => {
     let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
@@ -14,13 +17,10 @@ let checkToken = (req, res, next) => {
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
 
-                return res.status(400).send({
-                    message: "Token is not valid"
-                });
-                //return res.json({
-                //    success: false,
-                //    message: 'Token is not valid'
-                //});
+                obj.status = 400;
+                obj.msg = "Usuário expirou, faça login novamente.";
+                baseController.send(res, obj);
+
             } else {
                 let token = jwt.sign({ username: 'Admin' },
                     config.secret,
@@ -34,13 +34,10 @@ let checkToken = (req, res, next) => {
             }
         });
     } else {
-        return res.status(400).send({
-            message: "Auth token is not supplied"
-        });
-        //return res.json({
-        //    success: false,
-        //    message: 'Auth token is not supplied'
-        //});
+
+        obj.status = 400;
+        obj.msg = "Usuário não autenticado, faça login novamente.";
+        baseController.send(res, obj);
     }
 };
 
