@@ -1,4 +1,4 @@
-let jwt = require('jsonwebtoken');
+Ôªølet jwt = require('jsonwebtoken');
 const config = require('../../config/config');
 const baseController = require('../controllers/base.controller');
 
@@ -18,7 +18,7 @@ let checkToken = (req, res, next) => {
             if (err) {
 
                 obj.status = 400;
-                obj.msg = "Usu·rio expirou, faÁa login novamente.";
+                obj.msg = "Usu√°rio expirou, fa√ßa login novamente.";
                 baseController.send(res, obj);
 
             } else {
@@ -36,7 +36,7 @@ let checkToken = (req, res, next) => {
     } else {
 
         obj.status = 400;
-        obj.msg = "Usu·rio n„o autenticado, faÁa login novamente.";
+        obj.msg = "Usu√°rio n√£o autenticado, fa√ßa login novamente.";
         baseController.send(res, obj);
     }
 };

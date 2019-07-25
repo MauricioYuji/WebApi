@@ -24,7 +24,7 @@ exports.generateToken = (username) => {
     return jwt.sign({ username: username },
         config.secret,
         {
-            expiresIn: '1m' // expires in 24 hours
+            expiresIn: '24h' // expires in 24 hours
         }
     );
 };
