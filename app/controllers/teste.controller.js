@@ -3,7 +3,7 @@ const email = require('../controllers/email.controller.js');
 exports.default = (req, res) => {
     console.log("REQ", req);
     console.log("RES", res);
-    var json = { "Retorno teste": "Sucesso" };
+    var json = { "Retorno teste": "poa ksjd koasmkd masdm oasmdko m" };
     //email.send("yuji.shima09@gmail.com", "validateURL");
     res.send(json);
 };

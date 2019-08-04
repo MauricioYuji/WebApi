@@ -102,7 +102,9 @@ exports.update = (req, res) => {
 
     ImageModel.findByIdAndUpdate(req.params.id, {
         name: req.body.name || "Untitled Image",
-        img: req.body.img
+        img: req.body.img,
+        width: req.body.width,
+        height: req.body.height
     }, { new: true })
         .then(image => {
             if (!image) {

@@ -112,7 +112,8 @@ exports.findAll = (req, res) => {
 };
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
-    GameModel.findById(req.params.id)
+
+    GameModel.findById(req.params.id).populate("img", null)
         .then(games => {
             if (!games) {
                 return res.status(404).send({
