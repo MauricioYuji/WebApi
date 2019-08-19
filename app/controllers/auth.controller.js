@@ -59,6 +59,16 @@ exports.gettoken = (req, res) => {
         token: token
     });
 };
+exports.getuserrequest = (req, res) => {
+    let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
+    if (token != undefined) {
+        if (token.startsWith('Bearer ')) {
+            token = token.slice(7, token.length);
+        }
+        userid = token.split("/")[0];
+    }
+    return userid;
+};
 exports.signinfacebook = (req, res) => {
     UserModel.find({ email: req.body.email }).then(user => {
         user = user[0];

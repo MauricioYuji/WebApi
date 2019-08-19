@@ -2,6 +2,7 @@ module.exports = (app) => {
     const teste = require('../controllers/teste.controller.js');
     const auth = require('../controllers/auth.controller.js');
     const games = require('../controllers/games.controller.js');
+    const lists = require('../controllers/lists.controller.js');
     const images = require('../controllers/images.controller.js');
     const user = require('../controllers/user.controller.js');
     const middleware = require('../middlewares/middleware');
@@ -40,4 +41,10 @@ module.exports = (app) => {
     app.post('/images/add', middleware.checkToken, images.create);
     app.put('/images/edit/:id', middleware.checkToken, images.update);
     app.delete('/images/delete/:id', middleware.checkToken, images.delete);
+
+    app.get('/lists', middleware.checkToken, lists.findAll);
+    app.get('/lists/:id', middleware.checkToken, lists.findOne);
+    app.post('/lists/add', middleware.checkToken, lists.create);
+    app.put('/lists/edit/:id', middleware.checkToken, lists.update);
+    app.delete('/lists/delete/', middleware.checkToken, lists.delete);
 }

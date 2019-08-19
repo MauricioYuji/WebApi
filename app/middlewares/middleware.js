@@ -10,7 +10,9 @@ let checkToken = (req, res, next) => {
         if (token.startsWith('Bearer ')) {
             token = token.slice(7, token.length);
         }
+        token = token.split("/")[1];
     }
+    console.log("token: ", token);
     if (token) {
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
@@ -38,6 +40,7 @@ let checkToken = (req, res, next) => {
         baseController.send(res, obj);
     }
 };
+
 
 module.exports = {
     checkToken: checkToken
