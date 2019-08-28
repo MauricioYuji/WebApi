@@ -43,7 +43,9 @@ function main() {
     app.use(cors());
     // Routes & Handlers
     require('./app/routes/app.routes.js')(app);
+    app.use(express.static(__dirname + '/public/images'));
     app.listen(port, () => console.log(`Server is listening on port: ${port}`));
+    
 }
 
 main();

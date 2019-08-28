@@ -15,7 +15,7 @@ exports.send = (email, message, title) => {
         from: 'listupapp@outlook.com',
         to: email,
         subject: 'ListUP - ' + title,
-        text: message
+        html: message
     };
 
     transporter.sendMail(mailOptions, function (error, info) {

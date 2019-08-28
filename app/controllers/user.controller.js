@@ -2,13 +2,14 @@
 const emailController = require('../controllers/email.controller.js');
 const baseController = require('../controllers/base.controller.js');
 const obj = { status: 0, msg: "", data: null, type: 0 };
+const config = require('../../config/config');
 
 exports.createuser = (res, user) => {
     return UserModel.find({ email: user.email }).then(u => {
         if (u.length == 0) {
             return user.save().then(data => {
                 var token = baseController.encrypt(user.id, user.hash_password);
-                var html = '<a href="http://192.168.15.12:3000/confirm/' + user.id + '-' + token + '">Clique aqui para confirmar sua conta</a>';
+                var html = '<a href="' + config.baseURL + '/confirm/' + user.id + '-' + token + '">Clique aqui para confirmar sua conta</a>';
                 emailController.send(user.email, html, "Confirmação de conta");
                 obj.status = 200;
                 obj.msg = "Usuário criado, acesse seu email para confirmar a conta.";

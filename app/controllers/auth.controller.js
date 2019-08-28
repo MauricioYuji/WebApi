@@ -2,12 +2,31 @@
 const userController = require('../controllers/user.controller.js');
 const emailController = require('../controllers/email.controller.js');
 const baseController = require('../controllers/base.controller');
+const config = require('../../config/config');
 const obj = { status: 0, msg: "", data: null, type: 0 };
-
+const path = require('path');
 //exports.token = (username) => {
 //    return token = baseController.generateToken(username);
 //};
 
+async function createuser(res, req) {
+
+
+    var hash = baseController.makeid(6);
+    var pass = baseController.encrypt(req.body.password, hash);
+    const u = new UserModel({
+        photoURL: req.body.photoURL,
+        fullname: req.body.fullname,
+        email: req.body.email,
+        password: pass,
+        hash_password: hash,
+        flagtutorial: false,
+        emailconfirm: false,
+        isfacebook: req.body.isfacebook
+    });
+
+    userController.createuser(res, u);
+}
 async function login(res, userobj) {
     return UserModel.find({ email: userobj.username }).then(user => {
         if (user.length > 0) {
@@ -72,22 +91,7 @@ exports.getuserrequest = (req, res) => {
 exports.signinfacebook = (req, res) => {
     UserModel.find({ email: req.body.email }).then(user => {
         user = user[0];
-
-
-        var hash = baseController.makeid(6);
-        var pass = baseController.encrypt(req.body.password, hash);
-        const u = new UserModel({
-            photoURL: req.body.photoURL,
-            fullname: req.body.fullname,
-            email: req.body.email,
-            password: pass,
-            hash_password: hash,
-            flagtutorial: false,
-            emailconfirm: false,
-            isfacebook: req.body.isfacebook
-        });
-
-        userController.createuser(res, u);
+        createuser(res, req);
 
     }).catch(err => {
         console.log("err: ", err);
@@ -109,21 +113,7 @@ exports.loginfacebook = (req, res) => {
             };
             login(res, objuser);
         } else {
-
-            var hash = baseController.makeid(6);
-            var pass = baseController.encrypt(req.body.password, hash);
-            const u = new UserModel({
-                photoURL: req.body.photoURL,
-                fullname: req.body.fullname,
-                email: req.body.email,
-                password: pass,
-                hash_password: hash,
-                flagtutorial: false,
-                emailconfirm: false,
-                isfacebook: req.body.isfacebook
-            });
-
-            userController.createuser(res, u);
+            createuser(res, req);
         }
     }).catch(err => {
         console.log("err: ", err);
@@ -150,7 +140,7 @@ exports.sendconfirm = (req, res) => {
         if (u.length > 0) {
             var user = u[0];
             var token = baseController.encrypt(user.id, user.hash_password);
-            var html = '<a href="http://192.168.15.12:3000/confirm/' + user.id + '-' + token + '">Clique aqui para confirmar sua conta</a>';
+            var html = '<a href="' + config.baseURL + '/confirm/' + user.id + '-' + token + '" target="_blank">Clique aqui para confirmar sua conta</a>';
             emailController.send(user.email, html, "Confirmação de conta");
             obj.status = 200;
             obj.msg = "Confirmação enviada com sucesso, verifique seu email.";
@@ -178,7 +168,9 @@ exports.resetpassword = (req, res) => {
             var user = u[0];
             if (!user.isfacebook) {
                 var token = baseController.encrypt(user.id + user.password, user.hash_password);
-                var html = '<a href="http://192.168.15.12:3000/changepassword/?token=' + user.id + "-" + token + '">Clique aqui para definir sua nova senha</a>';
+                var html = '<img src="' + config.baseURL + '/logo.png"/><br/>' +
+                    '<p>Uma requisição de troca de senha foi feita para o seu usuário.</p>' +
+                    '<a href="' + config.baseURL + '/changepassword/?token=' + user.id + "-" + token + '">Clique aqui para definir sua nova senha</a>';
                 emailController.send(user.email, html, "Reset de senha");
                 obj.status = 200;
                 obj.msg = "Confira seu email para trocar a senha.";
@@ -229,6 +221,7 @@ exports.sendpassword = (req, res) => {
                     obj.status = 200;
                     obj.msg = "Senha alterada com sucesso.";
                 }
+                baseController.send(res, obj);
             }).catch(err => {
                 if (err.kind === 'ObjectId') {
                     obj.status = 404;
@@ -243,7 +236,6 @@ exports.sendpassword = (req, res) => {
             obj.status = 401;
             obj.msg = "Token invalido.";
         }
-        baseController.send(res, obj);
     }).catch(err => {
         if (err.kind === 'ObjectId') {
             obj.status = 404;

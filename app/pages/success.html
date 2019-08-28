@@ -1,6 +1,6 @@
-<html>
+ï»¿<html>
 <head>
-    <title>Confirmação de email</title>
+    <title>ConfirmaÃ§Ã£o de email</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
@@ -8,13 +8,47 @@
     <style>
         body {
             padding: 20px;
+            background-color: #000;
+            background-image: url('/background.png');
+            background-position: center;
+            background-size: cover;
         }
 
+        #logo {
+            margin-bottom: 40px;
+        }
+
+        #content {
+            max-width: 500px;
+            max-height: 400px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #FFF;
+            margin: auto;
+            padding: 40px;
+            display: block;
+            margin-top: 50vh;
+            position: absolute;
+            box-sizing: content-box;
+            transform: translateY(-50%);
+        }
+
+        p {
+            font-weight: bold;
+            font-size: 20px;
+            color: #0F0;
+        }
     </style>
     <script>
     </script>
 </head>
 <body>
-    Confirmado com sucesso
+    <div id="content">
+        <img id="logo" src="/logo.png" />
+        <p>
+            Email confirmado com sucesso!
+        </p>
+    </div>
 </body>
 </html>

@@ -12,7 +12,6 @@ let checkToken = (req, res, next) => {
         }
         token = token.split("/")[1];
     }
-    console.log("token: ", token);
     if (token) {
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
