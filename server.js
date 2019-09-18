@@ -40,9 +40,9 @@ function main() {
     });
 
     request('https://realemail.expeditedaddons.com/?api_key=NDMOZ4E5280608QT54C17AY16UPVX3JLHI39W9GF27RSBK&email=email@example.org&fix_typos=false', function (error, response, body) {
-        console.log('Status:', response.statusCode);
-        console.log('Headers:', JSON.stringify(response.headers));
-        console.log('Response:', body);
+        //console.log('Status:', response.statusCode);
+        //console.log('Headers:', JSON.stringify(response.headers));
+        //console.log('Response:', body);
     });
 
     var cors = require('cors');

@@ -43,8 +43,9 @@ module.exports = (app) => {
     app.delete('/images/delete/:id', middleware.checkToken, images.delete);
 
     app.get('/lists', middleware.checkToken, lists.findAll);
-    app.get('/lists/:id', middleware.checkToken, lists.findOne);
-    app.post('/lists/add', middleware.checkToken, lists.create);
-    app.put('/lists/edit/:id', middleware.checkToken, lists.update);
-    app.delete('/lists/delete/', middleware.checkToken, lists.delete);
+    app.get('/lists/:id', middleware.checkToken, lists.findAllByUser);
+    app.get('/list/:id', middleware.checkToken, lists.findOne);
+    app.post('/list/add', middleware.checkToken, lists.create);
+    app.put('/list/edit/:id', middleware.checkToken, lists.update);
+    app.delete('/list/delete/', middleware.checkToken, lists.delete);
 }

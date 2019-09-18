@@ -42,10 +42,10 @@ async function login(res, userobj) {
                 emailconfirm: user.emailconfirm
             };
             var token = baseController.generateToken(user.email);
-
             if (pass === user.password) {
                 if (user.emailconfirm) {
                     obj.status = 200;
+                    obj.type = 0;
                     obj.msg = "Sucesso";
                     obj.data = userobj;
                     obj.token = token;

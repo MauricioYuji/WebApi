@@ -4,15 +4,35 @@ const auth = require('../controllers/auth.controller.js');
 
 exports.findAll = (req, res) => {
     var perpage = parseInt(req.query.perpage);
+    var page = parseInt(req.query.page);
     var s = req.query.s;
 
     var search = {};
     var regexS = new RegExp('^.*' + s + '', 'i');
     if (s != undefined) {
-        search = { name: regexS };
+        search = { userid: regexS };
     }
     var query = ListModel.find(search).populate("game", null);
-    query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 }).then(games => {
+    query.limit(perpage).skip((page - 1) * perpage).sort({ name: 1 }).then(games => {
+        ListModel.countDocuments(search, function (err, count) {
+            //console.log("Number of users:", count);
+            var json = { "List": games, "Total": count };
+            //console.log("req: ", req.token);
+            //console.log("json: ", json);
+            res.send(json);
+        })
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving notes."
+        });
+    });
+};
+exports.findAllByUser = (req, res) => {
+    var perpage = parseInt(req.query.perpage);
+    var page = parseInt(req.query.page);
+    var search = { userid: req.params.id};
+    var query = ListModel.find(search).populate("game", null);
+    query.limit(perpage).skip((page - 1) * perpage).sort({ name: 1 }).then(games => {
         ListModel.countDocuments(search, function (err, count) {
             //console.log("Number of users:", count);
             var json = { "List": games, "Total": count };
