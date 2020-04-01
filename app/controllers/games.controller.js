@@ -95,7 +95,8 @@ exports.findAll = (req, res) => {
     //    }
     //};
     //console.log("c: ", c);
-    var query = GameModel.find(search).populate("img", null);
+    var query = GameModel.find(search);
+    //var query = GameModel.find(search).populate("img", null);
     query.limit(perpage).skip((req.query.page - 1) * perpage).sort({ name: 1 }).then(games => {
         GameModel.countDocuments(search, function (err, count) {
             //console.log("Number of users:", count);
@@ -113,7 +114,8 @@ exports.findAll = (req, res) => {
 // Find a single note with a noteId
 exports.findOne = (req, res) => {
 
-    GameModel.findById(req.params.id).populate("img", null)
+    //GameModel.findById(req.params.id).populate("img", null)
+    GameModel.findById(req.params.id)
         .then(games => {
             if (!games) {
                 return res.status(404).send({

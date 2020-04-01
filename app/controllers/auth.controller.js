@@ -29,6 +29,7 @@ async function createuser(res, req) {
 }
 async function login(res, userobj) {
     return UserModel.find({ email: userobj.username }).then(user => {
+        console.log("user: ", user);
         if (user.length > 0) {
             user = user[0];
             var pass = baseController.encrypt(userobj.password, user.hash_password);
@@ -80,7 +81,7 @@ exports.gettoken = (req, res) => {
 };
 exports.getuserrequest = (req, res) => {
     let token = req.headers['x-access-token'] || req.headers['authorization']; // Express headers are auto converted to lowercase
-    if (token != undefined) {
+    if (token !== undefined) {
         if (token.startsWith('Bearer ')) {
             token = token.slice(7, token.length);
         }
@@ -106,7 +107,7 @@ exports.signinfacebook = (req, res) => {
 exports.loginfacebook = (req, res) => {
     UserModel.find({ email: req.body.email }).then(user => {
         user = user[0];
-        if (user != undefined) {
+        if (user !== undefined) {
             var objuser = {
                 username: req.body.email,
                 password: req.body.password
@@ -209,7 +210,7 @@ exports.sendpassword = (req, res) => {
     UserModel.findById(id).then(user => {
 
         var checktoken = baseController.encrypt(user.id + user.password, user.hash_password);
-        if (token == checktoken) {
+        if (token === checktoken) {
             var password = baseController.encrypt(req.body.password, user.hash_password);
             UserModel.findByIdAndUpdate(id, {
                 password: password
@@ -260,7 +261,7 @@ exports.confirm = (req, res) => {
                 baseController.sendfile(res, obj);
             } else {
                 var checktoken = baseController.encrypt(id, user.hash_password);
-                if (checktoken == token) {
+                if (checktoken === token) {
                     UserModel.findByIdAndUpdate(id, {
                         emailconfirm: true
                     }, { new: true })
