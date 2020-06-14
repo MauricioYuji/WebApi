@@ -4,6 +4,8 @@ let jwt = require('jsonwebtoken');
 let config = require('./config/config');
 let middleware = require('./app/middlewares/middleware');
 var request = require('request');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 // create express app
 const app = express();
@@ -49,9 +51,13 @@ function main() {
     app.use(cors());
     // Routes & Handlers
     require('./app/routes/app.routes.js')(app);
+
+
+
+    app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));     
     app.use(express.static(__dirname + '/public/images'));
     app.listen(port, () => console.log(`Server is listening on port: ${port}`));
-    
+
 }
 
 main();

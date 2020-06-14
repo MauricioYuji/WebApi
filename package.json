@@ -21,6 +21,7 @@
     "mongoose": "^5.5.10",
     "nodemailer": "^6.3.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "swagger-ui-express": "^4.1.4"
   }
 }
